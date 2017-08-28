@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.dzr.data.persistence.dzr.dao.UserDao">
+    <resultMap id="getMap" type="com.dzr.data.persistence.dzr.entity.User"></resultMap>
+    <select id="getUserById" resultMap="getMap">
+        SELECT id, user_id , phone, account, password, create_time, update_time
+        FROM t_user
+        WHERE id = #{id,jdbcType=BIGINT}
+    </select>
+</mapper>

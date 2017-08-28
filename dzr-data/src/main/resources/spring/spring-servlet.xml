@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+
+    <!--<mvc:resources location="/static/" mapping="/static/**" />-->
+    <!--<mvc:resources location="/fileUpload/" mapping="/fileUpload/**" />-->
+
+    <context:component-scan base-package="com.dzr.*"
+                            name-generator="com.dzr.framework.spring.mvc.FullPackageBeanNameGenerator"/>
+    <!-- 启动注解驱动的Spring MVC功能，注册请求url和注解POJO类方法的映射 -->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <constructor-arg name="defaultCharset" value="UTF-8"></constructor-arg>
+            </bean>
+            <bean class="com.dzr.framework.convert.FastJsonHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+                <property name="features">
+                    <array value-type="com.alibaba.fastjson.serializer.SerializerFeature">
+                        <value>PrettyFormat</value>
+                        <value>WriteDateUseDateFormat</value>
+                    </array>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.dzr.framework.convert.String2DateConverter"/>
+                <bean class="com.dzr.framework.convert.Date2StringConverter"/>
+            </set>
+        </property>
+    </bean>
+
+    <aop:aspectj-autoproxy/>
+    <bean id="propertyConfigurer" class="com.dzr.common.util.PropertyPlaceholderConfigurer">
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="locations">
+            <list>
+                <value>classpath:/spring/conf.properties</value>
+            </list>
+        </property>
+    </bean>
+    <!--合并其他配置-->
+    <import resource="classpath:/spring/applicationContext.xml"/>
+    <import resource="classpath:spring/applicationContext-dataSource-user.xml"/>
+    <import resource="classpath:spring/applicationContext-mongo.xml"/>
+    <import resource="classpath:spring/applicationContext-redis.xml"/>
+    <import resource="classpath:spring/dubbo/applicationContext-dubbo-service.xml"/>
+</beans>
